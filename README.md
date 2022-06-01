@@ -1,7 +1,8 @@
-# cmoesgaard/infra
+# 🚢 cmoesgaard/home-ops
 
-A repo containing the infrastructure of my personal servers and Kubernetes cluster.
+A monorepo containing the infrastructure of my personal servers and Kubernetes cluster.
 
-## Inspiration
+Very much still a work in progress.
 
-The repo is inspired by the various home infrastructure repos in [awesome-home-kubernetes](https://github.com/k8s-at-home/awesome-home-kubernetes), expecially [onedr0p's](https://github.com/onedr0p/home-ops) setup.
+## 💡 Inspiration
+The repo is inspired by the various home infrastructure repos in [awesome-home-kubernetes](https://github.com/k8s-at-home/awesome-home-kubernetes).
