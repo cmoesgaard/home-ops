@@ -13,4 +13,10 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: k8s-at-home
+  values:
+    postgresql:
+      enable: true
+      persistence:
+        enabled: true
+        storageClass: local-path
   interval: 1m0s
