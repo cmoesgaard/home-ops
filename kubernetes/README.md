@@ -9,12 +9,12 @@ Built from the Flux [suggested monorepo structure](https://fluxcd.io/docs/guides
 
 ```
 ├── apps
-│   └── niflheim
+│   └── production
 ├── infrastructure
 │   ├── sources
 │   └── traefik
 └── clusters
-    └── niflheim
+    └── production
 ```
 
 ## Hardware
