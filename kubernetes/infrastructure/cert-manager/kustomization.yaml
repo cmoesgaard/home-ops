@@ -5,4 +5,4 @@ resources:
   - helm-release.yaml
   - clusterissuer.yaml
   - namespace.yaml
-  - secret.yaml
+  - cloudflare.sops.yaml
