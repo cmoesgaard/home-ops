@@ -19,4 +19,18 @@ spec:
       persistence:
         enabled: true
         storageClass: local-path
+    ingress:
+      main:
+        enabled: true
+        ingressClassName: traefik
+        annotations:
+          traefik.ingress.kubernetes.io/router.entrypoints: websecure
+        hosts:
+          - host: mealie.${SECRET_DOMAIN}
+            paths:
+              - path: /
+                pathType: Prefix
+        tls:
+          - hosts:
+              - mealie.${SECRET_DOMAIN}
   interval: 1m0s
