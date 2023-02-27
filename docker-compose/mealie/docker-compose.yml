@@ -1,0 +1,46 @@
+---
+version: "3.1"
+services:
+  mealie:
+    image: hkotel/mealie
+    container_name: mealie
+    restart: unless-stopped
+    depends_on:
+      - "postgres"
+    environment:
+      DB_ENGINE: postgres # Optional: 'sqlite', 'postgres'
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_SERVER: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: mealie
+    networks:
+      - traefik
+      - mealie
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.mealie.rule=Host(`${HOSTNAME}`)"
+      - "traefik.http.routers.mealie.entrypoints=websecure"
+      - "traefik.http.routers.mealie.tls.certresolver=mytlschallenge"
+      - "traefik.docker.network=traefik"
+  postgres:
+    container_name: postgres
+    image: postgres:14
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_USER: ${DB_USER}
+    networks:
+      - mealie
+    volumes:
+      - db:/var/lib/postgresql/data/
+      - ./db-data:/db-data
+
+networks:
+  traefik:
+    external: true
+  mealie:
+
+
+volumes:
+  db:

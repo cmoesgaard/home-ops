@@ -1,0 +1,52 @@
+---
+version: '3'
+
+services:
+
+  synapse:
+    image: docker.io/matrixdotorg/synapse:latest
+    restart: unless-stopped
+    environment:
+      - SYNAPSE_CONFIG_PATH=/etc/homeserver.yaml
+    volumes:
+      - ./homeserver.yaml:/etc/homeserver.yaml
+      - synapse:/data
+    depends_on:
+      - db
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.synapse.rule=Host(`${HOSTNAME}`) || ( Host(`${HOSTNAME_ROOT}`) && PathPrefix(`/_matrix`) )"
+      - "traefik.http.routers.synapse.entrypoints=websecure"
+      - "traefik.http.routers.synapse.tls.certresolver=mytlschallenge"
+      - "traefik.http.routers.synapse.service=synapse"
+      - "traefik.http.services.synapse.loadbalancer.server.port=8008"
+      - "traefik.port=8008"
+      - "traefik.docker.network=traefik"
+    networks:
+      - traefik
+      - prometheus
+      - synapse
+
+  db:
+    image: docker.io/postgres:10-alpine
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=synapse
+      - POSTGRES_PASSWORD=W7MVouU6jToCCa
+      - LANG=C
+    volumes:
+      - db:/var/lib/postgresql/data
+    networks:
+      - synapse
+
+volumes:
+  synapse:
+  db:
+
+
+networks:
+  traefik:
+    external: true
+  prometheus:
+    external: true
+  synapse:

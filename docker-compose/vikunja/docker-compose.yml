@@ -1,0 +1,66 @@
+---
+version: '3'
+
+services:
+  db:
+    image: mariadb:10
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_USER: vikunja
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: vikunja
+    volumes:
+      - db:/var/lib/mysql
+    restart: unless-stopped
+    networks:
+      - vikunja
+  api:
+    image: vikunja/api
+    environment:
+      VIKUNJA_DATABASE_HOST: db
+      VIKUNJA_DATABASE_PASSWORD: ${DB_PASSWORD}
+      VIKUNJA_DATABASE_TYPE: mysql
+      VIKUNJA_DATABASE_USER: vikunja
+      VIKUNJA_DATABASE_DATABASE: vikunja
+      VIKUNJA_SERVICE_JWTSECRET: ${JWT_SECRET}
+      VIKUNJA_SERVICE_FRONTENDURL: http://${HOSTNAME}/
+      VIKUNJA_SERVICE_ENABLEREGISTRATION: "false"
+    volumes:
+      - files:/app/vikunja/files
+    depends_on:
+      - db
+    restart: unless-stopped
+    networks:
+      - vikunja
+      - traefik
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.vikunjaapi.rule=Host(`${HOSTNAME}`) && PathPrefix(`/api/v1`, `/dav/`, `/.well-known/`)"
+      - "traefik.http.routers.vikunjaapi.entrypoints=websecure"
+      - "traefik.http.routers.vikunjaapi.tls.certresolver=mytlschallenge"
+      - "traefik.docker.network=traefik"
+  frontend:
+    image: vikunja/frontend
+    environment:
+      VIKUNJA_API_URL: https://${HOSTNAME}/api/v1
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.vikunja.rule=Host(`${HOSTNAME}`)"
+      - "traefik.http.routers.vikunja.entrypoints=websecure"
+      - "traefik.http.routers.vikunja.tls.certresolver=mytlschallenge"
+      - "traefik.docker.network=traefik"
+    networks:
+      - vikunja
+      - traefik
+
+volumes:
+  db:
+  files:
+
+
+networks:
+  traefik:
+    external: true
+  vikunja:
